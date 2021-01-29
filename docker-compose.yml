@@ -1,0 +1,33 @@
+---
+version: '2.4'
+
+services:
+  pbs:
+    image: pbs-docker:${IMAGE_LABEL}
+    entrypoint: /entrypoint.sh
+    container_name: pbs-docker
+    hostname: pbs
+    network_mode: bridge
+    ports:
+     - 8007:8007
+    volumes:
+      - pbs_etc:/etc/proxmox-backup
+      - pbs_logs:/var/log/proxmox-backup
+      - pbs_lib:/var/lib/proxmox-backup
+      - nfs-datastore:/mnt/nfs-datastore
+    restart: always
+    # stop_signal: SIGHUP
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+
+volumes:
+  pbs_etc:
+  pbs_logs:
+  pbs_lib:
+  nfs-datastore:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: nfsvers=2,addr=${NFS_SERVER},rw
+      device: "${NFS_SERVER}:${NFS_SHARE}"
+  
